@@ -1,0 +1,333 @@
+#!/usr/bin/perl
+# Copyright (C) 2008-2009, Mark Glines.  See "LICENSE".
+use strict;
+use warnings;
+
+use App::SVN::Bisect;
+use Getopt::Long;
+
+my $min     = undef;
+my $max     = undef;
+my $verbose = 0;
+my $help    = 0;
+my $version = 0;
+
+GetOptions(
+    "min=i"   => \$min,
+    "max=i"   => \$max,
+    "verbose" => \$verbose,
+    "version" => \$version,
+    "help"    => \$help,
+);
+
+if($version) {
+    print("This is svn-bisect version ", $App::SVN::Bisect::VERSION, ".\n");
+    exit(0);
+}
+
+unshift(@ARGV, "help") if $help;
+
+my $action = shift;
+
+my $bisect = App::SVN::Bisect->new(
+    Action  => $action,
+    Min     => $min,
+    Max     => $max,
+    Verbose => $verbose
+);
+$bisect->do_something_intelligent(@ARGV);
+
+
+=head1 NAME
+
+svn-bisect
+
+=head1 SYNOPSIS
+
+    $ svn-bisect start --min 25000 --max 26000
+    $ svn-bisect bad
+    $ svn-bisect bad
+    $ svn-bisect good
+    [etc etc]
+    $ svn-bisect reset
+
+
+=head1 DESCRIPTION
+
+This tool's purpose is to help you determine which revision of a subversion
+repository contains a change.  It does this by employing a binary search.
+It will manage the current revision of your checkout directory, and narrow
+in on the target revision, as you give it clues about the current revision
+such as "before" (this revision is before the one you want) or "after" (this
+revision is after the one you want).
+
+Start a bisect session with the "start" command.  Then, walk the binary tree
+by using the "before" and "after" commands.  When you are done, the tool will
+tell you the target revision.
+
+The most common usage scenario is finding out which rev a bug was introduced
+in.  For this purpose, some command aliases have been added: if the current
+revision contains the bug, you can use the "bad" command (meaning, this
+revision is "after" the change you want to find), otherwise use the "good" 
+command (meaning, this revision is "before" the change you want to find). 
+
+All commands should be run from within a subversion checkout directory.  After
+a "svn-bisect start", all subsequent svn-bisect commands need to be run from
+that same directory.
+
+
+=head1 SUBCOMMANDS
+
+=head2 start
+
+    svn-bisect start [--min M] [--max N]
+
+Start a new bisect session.  If --min isn't specified, you can specify it later
+with the "good" command.  If --max isn't specified, you can specify it later
+with the "bad" command.
+
+=head2 after
+
+    svn-bisect after [revision]
+    or: svn-bisect bad [revision]
+
+Inform svn-bisect that the specified revision is *after* the change we're
+looking for.  If you don't specify a revision number, the current revision of
+the working tree is used.  If you are looking for the rev which introduced a bug
+(which is the common case), the alias "bad" might be easier to remember.
+
+=head2 before
+
+    svn-bisect before [revision]
+    or: svn-bisect good [revision]
+
+Inform svn-bisect that the specified revision is *before* the change we're
+looking for.  If you don't specify a revision number, the current revision of
+the working tree is used.  If you are looking for the rev which introduced a bug
+(which is the common case), the alias "good" might be easier to remember.
+
+=head2 skip
+
+    svn-bisect skip [<rev> [<rev>...]]
+
+Tell svn-bisect to skip the specified revision.  If no revision is specified,
+the current version of the working tree is used.  Do this if you can't determine
+whether the current revision is bad or good, if, for instance, some other
+issue prevents it from compiling successfully.
+
+You may specify more than one revision, and they will all be skipped.
+
+=head2 unskip
+
+    svn-bisect unskip <rev> [<rev>...]
+
+Tell svn-bisect to no longer skip the specified revision.  You must specify
+at least one revision to unskip.  If you specify more than one, they will
+all be unskipped.
+
+=head2 reset
+
+    svn-bisect reset
+
+Clean up after a bisect, and return the repository to the revision it was at
+before you started.
+
+=head2 help
+
+    svn-bisect help
+    svn-bisect help start
+
+Gives you some useful descriptions and usage information.
+
+
+=head1 EXAMPLE
+
+...Because, you know, no software documentation is complete without a flashy
+screenshot, these days.
+
+So, lets say you were wondering when the subversion project added the
+"Last Changed Rev:" line to the output of "svn info".  Determining the
+existence of this change is a straightforward matter of searching for the
+text string... if a result was found, the current revision is "after",
+otherwise it was "before".  So a bisect looks like this:
+
+    $ svn co http://svn.collab.net/repos/svn/trunk/subversion
+    [snip lots of svn checkout spam]
+    Checked out revision 30958.
+    
+    $ cd subversion
+    
+    $ ack --nocolor --nogroup 'Last Changed Rev'
+    svn/info-cmd.c:351:    SVN_ERR(svn_cmdline_printf(pool, _("Last Changed Rev: %ld\n"),
+    
+    $ date
+    Fri May  2 12:52:20 PDT 2008
+    
+    $ svn-bisect start
+    There are 13853 revs left in the pool.  Choosing r15480.
+    
+    $ ack --nocolor --nogroup 'Last Changed Rev'
+    clients/cmdline/info-cmd.c:137:    SVN_ERR (svn_cmdline_printf (pool, _("Last Changed Rev: %ld\n"),
+    
+    $ svn-bisect after
+    There are 6926 revs left in the pool.  Choosing r6010.
+    
+    $ ack --nocolor --nogroup 'Last Changed Rev'
+    clients/cmdline/info-cmd.c:158:    printf ("Last Changed Rev: %" SVN_REVNUM_T_FMT "\n", entry->cmt_rev);
+    
+    $ svn-bisect after
+    There are 3463 revs left in the pool.  Choosing r2481.
+    
+    $ ack --nocolor --nogroup 'Last Changed Rev'
+    clients/cmdline/info-cmd.c:153:    printf ("Last Changed Rev: %" SVN_REVNUM_T_FMT "\n", entry->cmt_rev);
+    
+    $ svn-bisect after
+    There are 1731 revs left in the pool.  Choosing r1168.
+    
+    $ ack --nocolor --nogroup 'Last Changed Rev'
+    
+    $ svn-bisect before
+    There are 865 revs left in the pool.  Choosing r1800.
+    
+    $ ack --nocolor --nogroup 'Last Changed Rev'
+    
+    $ svn-bisect before
+    There are 432 revs left in the pool.  Choosing r2127.
+    
+    $ ack --nocolor --nogroup 'Last Changed Rev'
+    clients/cmdline/info-cmd.c:161:        printf ("Last Changed Rev: %" SVN_REVNUM_T_FMT "\n", entry->cmt_rev);
+    
+    $ svn-bisect after
+    There are 216 revs left in the pool.  Choosing r1961.
+    
+    $ ack --nocolor --nogroup 'Last Changed Rev'
+    clients/cmdline/info-cmd.c:161:        printf ("Last Changed Rev: %" SVN_REVNUM_T_FMT "\n", entry->cmt_rev);
+    
+    $ svn-bisect after
+    There are 108 revs left in the pool.  Choosing r1881.
+    
+    $ ack --nocolor --nogroup 'Last Changed Rev'
+    clients/cmdline/info-cmd.c:161:        printf ("Last Changed Rev: %" SVN_REVNUM_T_FMT "\n", entry->cmt_rev);
+    
+    $ svn-bisect after
+    There are 54 revs left in the pool.  Choosing r1845.
+    
+    $ ack --nocolor --nogroup 'Last Changed Rev'
+    clients/cmdline/info-cmd.c:150:        printf ("Last Changed Rev: %ld\n", entry->cmt_rev);
+    
+    $ svn-bisect after
+    There are 27 revs left in the pool.  Choosing r1827.
+    
+    $ ack --nocolor --nogroup 'Last Changed Rev'
+    clients/cmdline/info-cmd.c:150:        printf ("Last Changed Rev: %ld\n", entry->cmt_rev);
+    
+    $ svn-bisect after
+    There are 13 revs left in the pool.  Choosing r1809.
+    
+    $ ack --nocolor --nogroup 'Last Changed Rev'
+    clients/cmdline/info-cmd.c:153:            printf ("Last Changed Rev: %ld\n", entry->cmt_rev);
+    
+    $ svn-bisect after
+    There are 6 revs left in the pool.  Choosing r1806.
+    
+    $ ack --nocolor --nogroup 'Last Changed Rev'
+    
+    $ svn-bisect before
+    There are 2 revs left in the pool.  Choosing r1808.
+    
+    $ ack --nocolor --nogroup 'Last Changed Rev'
+    
+    $ svn-bisect before
+    This is the end of the road!  The change occurred in r1809.
+    
+    $ svn log -r1809
+    ------------------------------------------------------------------------
+    r1809 | rooneg | 2002-04-27 12:23:38 -0700 (Sat, 27 Apr 2002) | 30 lines
+    
+    As requested by cmpilato in issue #676, add an 'svn info' command, which 
+    prints out the contents of the svn_wc_entry_t for a given versioned resource.
+    
+    * CHANGES
+      note the addition of the 'svn info' command.
+    
+    * subversion/clients/cmdline/cl.h
+      add declaration for svn_cl__info.
+    
+    * subversion/clients/cmdline/info-cmd.c
+      new file implementing the info command.
+    
+    * subversion/clients/cmdline/main.c
+      hook up the info command.
+    
+    * subversion/clients/cmdline/man/svn.1
+      document the info command.
+    
+    * subversion/tests/clients/cmdline/getopt_tests_data/svn--help_stdout
+      update for the addition of info command.
+    
+    * subversion/tests/clients/cmdline/getopt_tests_data/svn_help_stdout
+      ditto.
+    
+    * subversion/tests/clients/cmdline/getopt_tests_data/svn_stderr
+      ditto.
+    
+    * tools/dev/bash_completion
+      add 'info' to the tab completion.
+    
+    ------------------------------------------------------------------------
+    
+    $ date
+    Fri May  2 12:56:00 PDT 2008
+
+So, there it is.  In 4 minutes, we've learned that "Last Changed Rev:" has been
+in there since the inception of the "svn info" command itself, back in 2002.
+
+
+=head1 REQUIREMENTS
+
+This tool requires:
+
+* A computer
+
+* A brain
+
+* An installation of Perl, version 5.8 or above
+
+* The IO::All module, installed from CPAN
+
+* The YAML module, installed from CPAN
+
+* The "svn" command somewhere in your PATH, executable by the current user
+
+* A svn checkout with some history to bisect.
+
+
+=head1 AUTHOR
+
+    Mark Glines <mark-cpan@glines.org>
+
+
+=head1 THANKS
+
+* Thanks to the git-bisect author(s), for coming up with a user interface that
+  I actually like.
+
+* Thanks to Will Coleda for inspiring me to actually write and release this.
+
+* Thanks to the Parrot project for having so much random stuff going on as to
+  make a tool like this necessary.
+
+
+=head1 SEE ALSO
+
+App::SVNBinarySearch by Will Coleda: L<http://search.cpan.org/dist/App-SVNBinarySearch/>
+
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2008 Mark Glines.
+
+It is distributed under the terms of the Artistic License 2.0.  For details,
+see the "LICENSE" file packaged alongside this tool.
+
+=cut

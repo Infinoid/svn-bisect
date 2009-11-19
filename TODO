@@ -1,0 +1,9 @@
+* Save off the commands run and unwind info to bisect.yaml.
+* Implement "log" and "replay" and "undo" based on above information.
+* Implement handling of svn:externals tags.  (Scan all subdirectories for them
+  if necessary.)  Make a list of all repositories that need to be updated,
+  based on whether they match the UUID of the current directory.  Add a
+  --no-externals to disable all of this.  Per request from Dennis Lubert.
+* Implement --logbase.  Default should be the current directory, and any
+  svn:externals which match the current directory's UUID.
+* Implement --base, per request from Dennis Lubert.

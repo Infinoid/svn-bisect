@@ -1,0 +1,8 @@
+This is a command-line tool inspired by "git-bisect", which allows you to
+perform binary searches among the revisions of a subversion project.
+
+There's lots of documentation in the "svn-bisect" file.  Author, usage,
+screenshot, license, it's all in there.  Please run "perldoc svn-bisect" to
+read it.  If you don't have a "perldoc" command, you can just open it in your
+favorite pager or text editor, or maybe even your web browser.  Or, if it has
+been installed properly, you could try "svn-bisect help".
