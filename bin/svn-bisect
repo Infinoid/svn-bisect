@@ -295,7 +295,7 @@ This tool requires:
 
 * The IO::All module, installed from CPAN
 
-* The YAML module, installed from CPAN
+* The YAML::Syck module, installed from CPAN
 
 * The "svn" command somewhere in your PATH, executable by the current user
 
@@ -305,6 +305,12 @@ This tool requires:
 =head1 AUTHOR
 
     Mark Glines <mark-cpan@glines.org>
+
+
+=head1 REPOSITORY
+
+Browser: L<http://github.com/Infinoid/svn-bisect/>
+Clone: L<git://github.com/Infinoid/svn-bisect.git>
 
 
 =head1 THANKS
