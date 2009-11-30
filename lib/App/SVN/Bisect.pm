@@ -146,6 +146,7 @@ sub before {
     my $self = shift;
     my $rev = shift;
     $rev = $$self{config}{cur} unless defined $rev;
+    $rev = $$self{config}{cur} = $self->find_cur() unless defined $rev;
     $rev = substr($rev, 1) if substr($rev, 0, 1) eq 'r';
     if($self->ready) {
         die("\"$rev\" is not a revision or is out of range.\n")
