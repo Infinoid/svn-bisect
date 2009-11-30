@@ -647,7 +647,7 @@ sub fetch_log_revs {
     my $self = shift;
     my $min = $$self{config}{min};
     my $max = $$self{config}{max};
-    print("Fetching history from r$min to r$max; it may take a while.\n")
+    stdout("Fetching history from r$min to r$max; it may take a while.\n")
         if(($max - $min) > 100);
     my %rv;
     my $log = $self->cmd("svn log -q -r$min:$max");
