@@ -317,6 +317,7 @@ where subcommand is one of:
     before (alias: "good")
     help   (hey, that's me!)
     reset
+    run
     skip
     start
     unskip

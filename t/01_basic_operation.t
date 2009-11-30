@@ -243,11 +243,11 @@ BEGIN { $tests += 3; };
 $bisect = test->new(Action => "help");
 $$bisect{rvs} = $test_responses;
 throws_ok(sub {$bisect->do_something_intelligent() }, qr/exit/, "help runs");
-is(scalar @{$$bisect{stdout}}, 11, "several lines written");
+is(scalar @{$$bisect{stdout}}, 12, "several lines written");
 like($$bisect{stdout}[0], qr/Usage:/, "first line is a Usage:");
 throws_ok(sub {$bisect->do_something_intelligent('_') }, qr/exit/, "help runs");
-is(scalar @{$$bisect{stdout}}, 22, "several lines written");
-like($$bisect{stdout}[11], qr/Usage:/, "first line is a Usage:");
+is(scalar @{$$bisect{stdout}}, 24, "several lines written");
+like($$bisect{stdout}[12], qr/Usage:/, "first line is a Usage:");
 throws_ok(sub {$bisect->do_something_intelligent('nonexistent') }, qr/No known help topic/, "help dies");
 BEGIN { $tests += 7; };
 
