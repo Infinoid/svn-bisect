@@ -1,3 +1,6 @@
+1.0 <git>
+* Add a message when we start fetching lots of history; it can take a while.
+
 0.9 Thu Nov 19 06:26:08 EST 2009
 * Change "repository maximum" to "revision history maximum", per RT #46566.
 * Implement revision lists for skip and unskip commands, per RT #51703.
