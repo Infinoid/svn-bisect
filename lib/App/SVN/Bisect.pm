@@ -41,6 +41,7 @@ my %actions = (
     'good'   => { read_config => 1, write_config => 1, handler => \&before },
     'help'   => { read_config => 0, write_config => 0, handler => \&help   },
     'reset'  => { read_config => 1, write_config => 0, handler => \&reset  },
+    'run'    => { read_config => 1, write_config => 1, handler => \&run    },
     'skip'   => { read_config => 1, write_config => 1, handler => \&skip   },
     'start'  => { read_config => 0, write_config => 1, handler => \&start  },
     'unskip' => { read_config => 1, write_config => 1, handler => \&unskip },
@@ -239,6 +240,63 @@ sub unskip {
 }
 
 
+=head2 run
+
+Runs a command repeatedly to automate the bisection process.
+
+We run the command and arguments until a conclusion is reached.  The
+command (usually a shell script) tells us about the current revision
+by way of its return code.  The following return codes are handled:
+
+    0: This revision is before the change we're looking for
+    1-124, 126-127: This revision includes the change we're looking for
+    125: This revision is untestable and should be skipped
+    any other value: The command failed to run, abort bisection.
+
+The normal caveats apply.  In particular, if your script makes any
+changes, don't forget to clean up afterwards.
+
+=cut
+
+sub run {
+    my $self = shift;
+    my @cmd = @_;
+    die("Usage: run <command> [arguments...]\n") unless scalar @cmd;
+    die("You have not yet defined a min and max.\n") unless $self->ready();
+    my @revs = $self->list_revs();
+    die("There are no revisions left to bisect.\n") unless scalar @revs;
+    while(1) {
+        @revs = $self->list_revs();
+        exit(0) unless scalar @revs;
+        system(@cmd);
+        if($? == -1) {
+            die("Failed to execute " . join(" ",@cmd) . "\n");
+        }
+        if($? & 127) {
+            die(sprintf("Command died with signal %d.\n", $? & 127));
+        }
+        my $rv = $? >> 8;
+        if($rv > 127) {
+            die("Command failed, returned $rv.\n");
+        }
+        if($rv == 0) {
+            $self->before();
+            unlink($$self{metadata});
+            io($$self{metadata}) < Dump($$self{config});
+        }
+        elsif($rv != 125) {
+            $self->after();
+            unlink($$self{metadata});
+            io($$self{metadata}) < Dump($$self{config});
+        } else {
+            $self->skip();
+            unlink($$self{metadata});
+            io($$self{metadata}) < Dump($$self{config});
+        }
+    }
+}
+
+
 =head2 help
 
 Allows the user to get some descriptions and usage information.
@@ -314,6 +372,24 @@ Undoes the effects of "skip <rev>", putting the specified revision
 back into the normal rotation (if it is still within the range of revisions
 currently under scrutiny).  The revision argument is required.  You may
 specify more than one revision, and they will all be unskipped at once.
+END
+        'run' => <<"END",
+Usage: $0 run <command> [arguments...]
+
+Runs a command repeatedly to automate the bisection process.
+
+The command is run with the specified arguments until a conclusion is
+reached.  The command (usually a shell script) tells us about the
+current revision by way of its return code.  The following return codes
+are handled:
+
+    0: This revision is before the change we're looking for
+    1-124, 126-127: This revision includes the change we're looking for
+    125: This revision is untestable and should be skipped
+    any other value: The command failed to run, abort bisection.
+
+The normal caveats apply.  In particular, if your script makes any
+changes, don't forget to clean up afterwards.
 END
         'view' => <<"END",
 Usage: $0 view

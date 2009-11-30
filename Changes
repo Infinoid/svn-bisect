@@ -1,5 +1,6 @@
 1.0 <git>
 * Add a message when we start fetching lots of history; it can take a while.
+* Add "svn-bisect run", Coke++ for nagging me about this.
 
 0.9 Thu Nov 19 06:26:08 EST 2009
 * Change "repository maximum" to "revision history maximum", per RT #46566.

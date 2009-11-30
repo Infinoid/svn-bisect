@@ -125,6 +125,24 @@ Tell svn-bisect to no longer skip the specified revision.  You must specify
 at least one revision to unskip.  If you specify more than one, they will
 all be unskipped.
 
+=head2 run
+
+    svn-bisect run <command> [arguments...]
+
+Runs a command repeatedly to automate the bisection process.
+
+We run the command and arguments until a conclusion is reached.  The
+command (usually a shell script) tells us about the current revision
+by way of its return code.  The following return codes are handled:
+
+    0: This revision is before the change we're looking for
+    1-124, 126-127: This revision includes the change we're looking for
+    125: This revision is untestable and should be skipped
+    any other value: The command failed to run, abort bisection.
+
+The normal caveats apply.  In particular, if your script makes any
+changes, don't forget to clean up afterwards.
+
 =head2 reset
 
     svn-bisect reset
