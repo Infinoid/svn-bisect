@@ -235,7 +235,7 @@ ok(-f catfile(".svn", "bisect.yaml"), "metadata file still exists");
 $bisect = test->new(Action => "reset", Min => 0, Verbose => 0);
 $$bisect{rvs} = $test_responses;
 $bisect->do_something_intelligent();
-ok(!defined $$bisect{stdout}, "no output");
+is(scalar @{$$bisect{stdout}}, 1, "1 line of output");
 ok(!-f catfile(".svn", "bisect.yaml"), "metadata file removed");
 BEGIN { $tests += 3; };
 

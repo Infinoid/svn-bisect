@@ -8,6 +8,7 @@ use Getopt::Long;
 
 my $min     = undef;
 my $max     = undef;
+my $back    = 0;
 my $verbose = 0;
 my $help    = 0;
 my $version = 0;
@@ -15,6 +16,7 @@ my $version = 0;
 GetOptions(
     "min=i"   => \$min,
     "max=i"   => \$max,
+    "back"    => \$back,
     "verbose" => \$verbose,
     "version" => \$version,
     "help"    => \$help,
@@ -33,7 +35,8 @@ my $bisect = App::SVN::Bisect->new(
     Action  => $action,
     Min     => $min,
     Max     => $max,
-    Verbose => $verbose
+    Verbose => $verbose,
+    Back    => $back
 );
 $bisect->do_something_intelligent(@ARGV);
 

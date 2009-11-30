@@ -185,15 +185,24 @@ sub after {
 
 =head2 reset
 
-Cleans up after a bisect session; moves the working tree back to the original
-revision it had when "start" was first called.
+Cleans up after a bisect session.  If --back is passed, it also moves
+the working tree back to the original revision it had when "start" was
+first called.
 
 =cut
 
 sub reset {
     my $self = shift;
+    my $arg  = $$self{args}{Back};
     my $orig = $$self{config}{orig};
-    return $self->update_to($orig);
+    if(defined($arg) && $arg) {
+        $self->stdout("Resetting your checkout back to r$orig.\n");
+        return $self->update_to($orig);
+    } else {
+        my $cur = $self->find_cur();
+        $self->stdout("Cleaned up.  Your checkout is still at rev r$cur.\n");
+        return 0;
+    }
 }
 
 
@@ -343,10 +352,11 @@ Tells the bisect routine that the specified (or current) checkout is
 change in behavior, whatever.
 END
         'reset' => <<"END",
-Usage: $0 reset
+Usage: $0 reset [--back]
 
-Tries to clean up after itself, resets your checkout back to the original
-version, and removes its temporary datafile.
+Cleans up after a bisect, removes the temporary data file.  if you
+specify --back, it will also reset your checkout back to the original
+version.
 END
         'skip' => <<"END",
 Usage: $0 skip [<rev> [<rev>...]]

@@ -3,6 +3,8 @@
 * Add "svn-bisect run", Coke++ for nagging me about this.
 * Fix a small bug in "svn-bisect good", which triggered at bisect-setup time
   when the user runs it after "bad" and didn't pass a revision number.
+* "reset" does not reset you back to the original revision by default.  Use
+  --back if you want the old behavior.
 
 0.9 Thu Nov 19 06:26:08 EST 2009
 * Change "repository maximum" to "revision history maximum", per RT #46566.
