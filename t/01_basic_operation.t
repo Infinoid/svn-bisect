@@ -19,7 +19,7 @@ mkdir(".svn");
 package test;
 use Test::More;
 our @ISA = qw(test2);
-sub run {
+sub cmd {
     my ($self, $cmd) = @_;
     $$self{cmds} = [] unless exists $$self{cmds};
     push(@{$$self{cmds}}, $cmd);
@@ -43,7 +43,7 @@ sub exit {
 package test2;
 use Test::More;
 our @ISA = qw(App::SVN::Bisect);
-sub run {
+sub cmd {
     my ($self, $cmd) = @_;
     $$self{cmds} = [] unless exists $$self{cmds};
     push(@{$$self{cmds}}, $cmd);
@@ -252,15 +252,15 @@ throws_ok(sub {$bisect->do_something_intelligent('nonexistent') }, qr/No known h
 BEGIN { $tests += 7; };
 
 
-# test ->run()
+# test ->cmd()
 $? = 0;
 $$bisect{stdout} = [];
-my $version = eval { App::SVN::Bisect::run($bisect, "svn --version") };
+my $version = eval { App::SVN::Bisect::cmd($bisect, "svn --version") };
 SKIP: {
     skip "no svn command found!", 4 if $?;
 
     like($version, qr/Subversion/, "svn --version output matches /Subversion/");
-    throws_ok(sub { App::SVN::Bisect::run($bisect, "svn --unknown-arg 2>/dev/null") },
+    throws_ok(sub { App::SVN::Bisect::cmd($bisect, "svn --unknown-arg 2>/dev/null") },
         qr/exit/, "handles error");
     is(scalar @{$$bisect{stdout}}, 2, "two lines written");
     like($$bisect{stdout}[1], qr/Please fix that/, "informative message");

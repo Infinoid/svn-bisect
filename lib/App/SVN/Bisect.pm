@@ -377,15 +377,15 @@ sub view {
 
 =head1 INTERNAL METHODS
 
-=head2 run
+=head2 cmd
 
-    my $stdout = $self->run("svn info");
+    my $stdout = $self->cmd("svn info");
 
 Runs a command, returns its output.
 
 =cut
 
-sub run {
+sub cmd {
     my ($self, $cmd) = @_;
     $self->verbose("Running: $cmd\n");
     my $output = qx($cmd);
@@ -552,7 +552,7 @@ Calls 'svn update' to move to the specified revision.
 sub update_to {
     my ($self, $rev) = @_;
     my $cmd = "svn update -r$rev";
-    $self->run($cmd);
+    $self->cmd($cmd);
 }
 
 
@@ -573,7 +573,7 @@ sub fetch_log_revs {
     print("Fetching history from r$min to r$max; it may take a while.\n")
         if(($max - $min) > 100);
     my %rv;
-    my $log = $self->run("svn log -q -r$min:$max");
+    my $log = $self->cmd("svn log -q -r$min:$max");
     $log =~ s/\r//;
     foreach my $line (split(/\n+/, $log)) {
         if($line =~ /^r(\d+) /) {
@@ -595,7 +595,7 @@ within the repository.
 
 sub find_max {
     my $self = shift;
-    my $log = $self->run("svn log -q -rHEAD:PREV");
+    my $log = $self->cmd("svn log -q -rHEAD:PREV");
     $log =~ s/\r//;
     foreach my $line (split(/\n+/, $log)) {
         if($line =~ /^r(\d+) /) {
@@ -616,7 +616,7 @@ Parses the output of "svn info" to figure out what the current revision is.
 
 sub find_cur {
     my $self = shift;
-    my $info = $self->run("svn info");
+    my $info = $self->cmd("svn info");
     $info =~ s/\r//;
     # parse the "Last Changed Rev:" entry
     foreach my $line (split(/\n+/, $info)) {
