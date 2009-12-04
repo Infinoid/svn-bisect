@@ -1,6 +1,8 @@
-1.0 <git>
+1.0 Fri Dec  4 10:55:23 EST 2009
 * Add a message when we start fetching lots of history; it can take a while.
 * Add "svn-bisect run", Coke++ for nagging me about this.
+* Restrict option parsing to options that occur before the subcommand; this
+  leaves later options intact (so we can pass them to "run" commands).
 * Fix a small bug in "svn-bisect good", which triggered at bisect-setup time
   when the user runs it after "bad" and didn't pass a revision number.
 * "reset" does not reset you back to the original revision by default.  Use
