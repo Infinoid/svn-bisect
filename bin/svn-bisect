@@ -172,7 +172,7 @@ Runs a command repeatedly to automate the bisection process.
 Examples:
 
     svn-bisect run ./mytest.sh
-    svn-bisect run sh -c 'if test -f file; then exit 1; else exit 0; fi'
+    svn-bisect run test ! -f file
 
 We run the command and arguments until a conclusion is reached.  The
 command (usually a shell script) tells us about the current revision
@@ -182,6 +182,10 @@ by way of its return code.  The following return codes are handled:
     1-124, 126-127: This revision includes the change we're looking for
     125: This revision is untestable and should be skipped
     any other value: The command failed to run, abort bisection.
+
+In other words, "run" will automatically find the last revision for
+which the given command returns success.  (Keep in mind that in the
+shell, "0" means "success".)
 
 The normal caveats apply.  In particular, if your script makes any
 changes, don't forget to clean up afterwards.

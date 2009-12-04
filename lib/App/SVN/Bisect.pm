@@ -7,7 +7,7 @@ use File::Spec;
 use IO::All;
 use YAML::Syck;
 
-our $VERSION = 0.9;
+our $VERSION = '1.0';
 
 =head1 NAME
 
@@ -658,7 +658,7 @@ sub fetch_log_revs {
     my $self = shift;
     my $min = $$self{config}{min};
     my $max = $$self{config}{max};
-    stdout("Fetching history from r$min to r$max; it may take a while.\n")
+    $self->stdout("Fetching history from r$min to r$max; it may take a while.\n")
         if(($max - $min) > 100);
     my %rv;
     my $log = $self->cmd("svn log -q -r$min:$max");
