@@ -352,7 +352,7 @@ Tells the bisect routine that the specified (or current) checkout is
 change in behavior, whatever.
 END
         'reset' => <<"END",
-Usage: $0 reset [--back]
+Usage: $0 [--back] reset
 
 Cleans up after a bisect, removes the temporary data file.  if you
 specify --back, it will also reset your checkout back to the original
