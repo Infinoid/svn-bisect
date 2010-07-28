@@ -216,100 +216,108 @@ existence of this change is a straightforward matter of searching for the
 text string... if a result was found, the current revision is "after",
 otherwise it was "before".  So a bisect looks like this:
 
-    $ svn co http://svn.collab.net/repos/svn/trunk/subversion
-    [snip lots of svn checkout spam]
-    Checked out revision 30958.
+    $ svn co http://svn.apache.org/repos/asf/subversion/trunk/subversion
+    [snip lots of subversion checkout spam]
+    Checked out revision 980012.
     
     $ cd subversion
     
     $ ack --nocolor --nogroup 'Last Changed Rev'
-    svn/info-cmd.c:351:    SVN_ERR(svn_cmdline_printf(pool, _("Last Changed Rev: %ld\n"),
+    svn/info-cmd.c:362:    SVN_ERR(svn_cmdline_printf(pool, _("Last Changed Rev: %ld\n"),
+    tests/cmdline/depth_tests.py:2056:      'Last Changed Rev'   : '^1$',
+    tests/cmdline/upgrade_tests.py:387:      'Last Changed Rev' : '7'
+    tests/cmdline/upgrade_tests.py:396:      'Last Changed Rev' : '10'
     
     $ date
-    Fri May  2 12:52:20 PDT 2008
+    Wed Jul 28 06:40:03 EDT 2010
     
-    $ svn-bisect start
-    $ svn-bisect before 0
+    $ svn-bisect --min 0 start
     $ svn-bisect after
-    There are 13853 revs left in the pool.  Choosing r15480.
+    Fetching history from r0 to r980012; it may take a while.
+    There are 24349 revs left in the pool.  Choosing r862045.
     
-    $ ack --nocolor --nogroup 'Last Changed Rev'
-    clients/cmdline/info-cmd.c:137:    SVN_ERR (svn_cmdline_printf (pool, _("Last Changed Rev: %ld\n"),
+    infinoid@chirp:~/subversion$ ack --nocolor --nogroup 'Last Changed Rev'
+    svn/info-cmd.c:348:    SVN_ERR(svn_cmdline_printf(pool, _("Last Changed Rev: %ld\n"),
     
-    $ svn-bisect after
-    There are 6926 revs left in the pool.  Choosing r6010.
+    infinoid@chirp:~/subversion$ svn-bisect after
+    There are 12174 revs left in the pool.  Choosing r845633.
     
-    $ ack --nocolor --nogroup 'Last Changed Rev'
-    clients/cmdline/info-cmd.c:158:    printf ("Last Changed Rev: %" SVN_REVNUM_T_FMT "\n", entry->cmt_rev);
-    
-    $ svn-bisect after
-    There are 3463 revs left in the pool.  Choosing r2481.
-    
-    $ ack --nocolor --nogroup 'Last Changed Rev'
+    infinoid@chirp:~/subversion$ ack --nocolor --nogroup 'Last Changed Rev'
     clients/cmdline/info-cmd.c:153:    printf ("Last Changed Rev: %" SVN_REVNUM_T_FMT "\n", entry->cmt_rev);
     
-    $ svn-bisect after
-    There are 1731 revs left in the pool.  Choosing r1168.
+    infinoid@chirp:~/subversion$ svn-bisect after
+    There are 6087 revs left in the pool.  Choosing r840416.
     
-    $ ack --nocolor --nogroup 'Last Changed Rev'
+    infinoid@chirp:~/subversion$ ack --nocolor --nogroup 'Last Changed Rev'
     
-    $ svn-bisect before
-    There are 865 revs left in the pool.  Choosing r1800.
+    infinoid@chirp:~/subversion$ svn-bisect before
+    There are 3043 revs left in the pool.  Choosing r842636.
     
-    $ ack --nocolor --nogroup 'Last Changed Rev'
+    infinoid@chirp:~/subversion$ ack --nocolor --nogroup 'Last Changed Rev'
+    clients/cmdline/info-cmd.c:153:    printf ("Last Changed Rev: %" SVN_REVNUM_T_FMT "\n", entry->cmt_rev);
     
-    $ svn-bisect before
-    There are 432 revs left in the pool.  Choosing r2127.
+    infinoid@chirp:~/subversion$ svn-bisect after
+    There are 1521 revs left in the pool.  Choosing r841463.
     
-    $ ack --nocolor --nogroup 'Last Changed Rev'
+    infinoid@chirp:~/subversion$ ack --nocolor --nogroup 'Last Changed Rev'
+    
+    infinoid@chirp:~/subversion$ svn-bisect before
+    There are 760 revs left in the pool.  Choosing r841993.
+    
+    infinoid@chirp:~/subversion$ ack --nocolor --nogroup 'Last Changed Rev'
     clients/cmdline/info-cmd.c:161:        printf ("Last Changed Rev: %" SVN_REVNUM_T_FMT "\n", entry->cmt_rev);
     
-    $ svn-bisect after
-    There are 216 revs left in the pool.  Choosing r1961.
+    infinoid@chirp:~/subversion$ svn-bisect after
+    There are 380 revs left in the pool.  Choosing r841730.
     
-    $ ack --nocolor --nogroup 'Last Changed Rev'
-    clients/cmdline/info-cmd.c:161:        printf ("Last Changed Rev: %" SVN_REVNUM_T_FMT "\n", entry->cmt_rev);
+    infinoid@chirp:~/subversion$ ack --nocolor --nogroup 'Last Changed Rev'
     
-    $ svn-bisect after
-    There are 108 revs left in the pool.  Choosing r1881.
+    infinoid@chirp:~/subversion$ svn-bisect before
+    There are 189 revs left in the pool.  Choosing r841860.
     
-    $ ack --nocolor --nogroup 'Last Changed Rev'
-    clients/cmdline/info-cmd.c:161:        printf ("Last Changed Rev: %" SVN_REVNUM_T_FMT "\n", entry->cmt_rev);
+    infinoid@chirp:~/subversion$ ack --nocolor --nogroup 'Last Changed Rev'
     
-    $ svn-bisect after
-    There are 54 revs left in the pool.  Choosing r1845.
+    infinoid@chirp:~/subversion$ svn-bisect before
+    There are 94 revs left in the pool.  Choosing r841933.
     
-    $ ack --nocolor --nogroup 'Last Changed Rev'
+    infinoid@chirp:~/subversion$ ack --nocolor --nogroup 'Last Changed Rev'
+    clients/cmdline/info-cmd.c:151:        printf ("Last Changed Rev: %" SVN_REVNUM_T_FMT "\n", entry->cmt_rev);
+    
+    infinoid@chirp:~/subversion$ svn-bisect after
+    There are 47 revs left in the pool.  Choosing r841904.
+    
+    infinoid@chirp:~/subversion$ ack --nocolor --nogroup 'Last Changed Rev'
     clients/cmdline/info-cmd.c:150:        printf ("Last Changed Rev: %ld\n", entry->cmt_rev);
     
-    $ svn-bisect after
-    There are 27 revs left in the pool.  Choosing r1827.
+    infinoid@chirp:~/subversion$ svn-bisect after
+    There are 23 revs left in the pool.  Choosing r841880.
     
-    $ ack --nocolor --nogroup 'Last Changed Rev'
-    clients/cmdline/info-cmd.c:150:        printf ("Last Changed Rev: %ld\n", entry->cmt_rev);
+    infinoid@chirp:~/subversion$ ack --nocolor --nogroup 'Last Changed Rev'
     
-    $ svn-bisect after
-    There are 13 revs left in the pool.  Choosing r1809.
+    infinoid@chirp:~/subversion$ svn-bisect before
+    There are 11 revs left in the pool.  Choosing r841890.
     
-    $ ack --nocolor --nogroup 'Last Changed Rev'
+    infinoid@chirp:~/subversion$ ack --nocolor --nogroup 'Last Changed Rev'
     clients/cmdline/info-cmd.c:153:            printf ("Last Changed Rev: %ld\n", entry->cmt_rev);
     
-    $ svn-bisect after
-    There are 6 revs left in the pool.  Choosing r1806.
+    infinoid@chirp:~/subversion$ svn-bisect after
+    There are 5 revs left in the pool.  Choosing r841883.
     
-    $ ack --nocolor --nogroup 'Last Changed Rev'
+    infinoid@chirp:~/subversion$ ack --nocolor --nogroup 'Last Changed Rev'
+    clients/cmdline/info-cmd.c:153:            printf ("Last Changed Rev: %ld\n", entry->cmt_rev);
     
-    $ svn-bisect before
-    There are 2 revs left in the pool.  Choosing r1808.
+    infinoid@chirp:~/subversion$ svn-bisect after
+    There are 2 revs left in the pool.  Choosing r841882.
     
-    $ ack --nocolor --nogroup 'Last Changed Rev'
+    infinoid@chirp:~/subversion$ ack --nocolor --nogroup 'Last Changed Rev'
     
-    $ svn-bisect before
-    This is the end of the road!  The change occurred in r1809.
+    infinoid@chirp:~/subversion$ svn-bisect before
+    This is the end of the road!
+    The change occurred in r841883.
     
-    $ svn log -r1809
+    infinoid@chirp:~/subversion$ svn log -r841883
     ------------------------------------------------------------------------
-    r1809 | rooneg | 2002-04-27 12:23:38 -0700 (Sat, 27 Apr 2002) | 30 lines
+    r841883 | rooneg | 2002-04-27 15:23:38 -0400 (Sat, 27 Apr 2002) | 30 lines
     
     As requested by cmpilato in issue #676, add an 'svn info' command, which 
     prints out the contents of the svn_wc_entry_t for a given versioned resource.
@@ -344,10 +352,15 @@ otherwise it was "before".  So a bisect looks like this:
     ------------------------------------------------------------------------
     
     $ date
-    Fri May  2 12:56:00 PDT 2008
+    Wed Jul 28 06:45:27 EDT 2010
 
-So, there it is.  In 4 minutes, we've learned that "Last Changed Rev:" has been
+So, there it is.  In 5 minutes, we've learned that "Last Changed Rev:" has been
 in there since the inception of the "svn info" command itself, back in 2002.
+
+You can also provide a script command to do all of the work for you:
+
+    $ svn-bisect --min 0 --max 980012 start
+    $ svn-bisect run '! grep -r "Last Changed Rev" .'
 
 
 =head1 REQUIREMENTS
