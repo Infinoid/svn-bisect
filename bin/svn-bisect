@@ -14,13 +14,18 @@ my $help    = 0;
 my $version = 0;
 
 GetOptions(
-    "min=i"   => \$min,
-    "max=i"   => \$max,
+    "min=s"   => \$min,
+    "max=s"   => \$max,
     "back"    => \$back,
     "verbose" => \$verbose,
     "version" => \$version,
     "help"    => \$help,
 );
+
+die("Value \"$min\" invalid for option min (revision expected)\n")
+    if(defined($min) && $min !~ /^r?\d+$/);
+die("Value \"$max\" invalid for option min (revision expected)\n")
+    if(defined($max) && $max !~ /^r?\d+$/);
 
 if($version) {
     print("This is svn-bisect version ", $App::SVN::Bisect::VERSION, ".\n");
