@@ -2,6 +2,7 @@ use strict;
 use warnings;
 
 use File::Temp qw(tempdir);
+use Cwd qw(getcwd);
 use Test::More;
 use Test::Exception;
 use Test::Output;
@@ -12,6 +13,7 @@ my $tests;
 BEGIN { $tests = 0; };
 plan tests => $tests;
 
+my $curdir = getcwd();
 my $tempdir = tempdir( CLEANUP => 1 );
 chdir($tempdir);
 mkdir(".svn");
@@ -294,5 +296,6 @@ BEGIN { $tests += 1; };
 
 
 # test ->exit()
+chdir $curdir;
 App::SVN::Bisect->exit(0);
 exit(1);
