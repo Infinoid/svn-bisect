@@ -128,6 +128,7 @@ sub start {
     $$self{config}{orig} = $self->find_cur();
     my $max = $self->find_max();
     if(defined($$self{args}{Max})) {
+        $$self{args}{Max} = substr($$self{args}{Max},1) if substr($$self{args}{Max},0,1) eq 'r';
         $$self{config}{max} = $$self{args}{Max};
         die("Given 'max' value is greater than the working directory maximum $max!\n")
             if $$self{config}{max} > $max;
@@ -221,6 +222,7 @@ sub skip {
     my @rev = @_;
     @rev = $$self{config}{cur} unless scalar @rev;
     foreach my $rev (@rev) {
+        $rev = substr($rev, 1) if substr($rev, 0, 1) eq 'r';
         die("\"$rev\" is not a revision or is out of range.\n")
             unless exists($$self{config}{extant}{$rev});
         $$self{config}{skip}{$rev} = 1;
@@ -243,6 +245,7 @@ sub unskip {
     my @rev = @_;
     die("Usage: unskip <revision>\n") unless scalar @rev;
     foreach my $rev (@rev) {
+        $rev = substr($rev, 1) if substr($rev, 0, 1) eq 'r';
         die("\"$rev\" is not a revision or is out of range.\n")
             unless exists($$self{config}{extant}{$rev});
         delete($$self{config}{skip}{$rev});
@@ -504,6 +507,8 @@ sub ready {
     my $self = shift;
     return 0 unless defined $$self{config}{min};
     return 0 unless defined $$self{config}{max};
+    $$self{config}{min} = substr($$self{config}{min},1) if substr($$self{config}{min},0,1) eq 'r';
+    $$self{config}{max} = substr($$self{config}{max},1) if substr($$self{config}{max},0,1) eq 'r';
     $$self{config}{extant} = $self->fetch_log_revs()
         unless defined $$self{config}{extant};
     return 1;
