@@ -82,6 +82,7 @@ sub new {
             unless -f $metadata;
         $$self{config} = Load(io($metadata)->all);
     }
+    $ENV{LC_MESSAGES} = 'C';
     return bless($self, $package);
 }
 
