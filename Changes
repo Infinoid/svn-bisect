@@ -1,3 +1,9 @@
+1.1 Sun Aug 29 09:52:13 EDT 2010
+* Handle revision strings with leading "r"'s, RT #57837, Coke++.
+* Set LC_MESSAGES to "C" to avoid parse errors, RT #56963, Casiano++.
+* Fix tmpdir cleanup in the test suite, RT #59766, Rurban++.
+* Update the example text in the perldoc for the new svn repository location.
+
 1.0 Fri Dec  4 10:55:23 EST 2009
 * Add a message when we start fetching lots of history; it can take a while.
 * Add "svn-bisect run", Coke++ for nagging me about this.
