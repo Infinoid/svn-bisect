@@ -3,6 +3,9 @@
 use strict;
 use warnings;
 
+use FindBin;
+use lib "$FindBin::RealBin/../lib";
+
 use App::SVN::Bisect;
 use Getopt::Long qw(:config require_order);
 
